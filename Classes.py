@@ -32,7 +32,7 @@ class Labyrinth:
 
         background = pygame.image.load("img/background5.jpg")
         wall = pygame.image.load("img/wall2.jpg")
-        finish = pygame.image.load("img/finish.jpg")
+        finish = pygame.image.load("img/murdoc.png")
         y_pos = 0
         for lines in level.grid:
             # for each line we set the line position (sprite size = 31*31
@@ -62,9 +62,10 @@ class Character:
         self.pos = char_pos
         self.sprite = char_sprite
         self.img = pygame.image.load("img/mcgiver.png").convert()
+        self.bag_content = 0
 
 
-    def move(self, direction, level):
+    def move(self, direction, level, needle, tube, ether):
 
         #while receiving a direction, check if it's not a wall or the border, then move and update position
         if direction == "up":
@@ -88,6 +89,25 @@ class Character:
                     self.pos = [(self.pos[0] - 45), (self.pos[1])]
                     self.sprite = [(self.sprite[0]), (self.sprite[1] - 1)]
 
+        #check if there is an object to collect
+        if self.sprite == needle.sprite:
+            #update bag comp and remove object from lab
+            needle.location = "bag"
+            needle.sprite = ()
+            self.bag_content += 1
+
+        if self.sprite == tube.sprite:
+            #update bag comp and remove object from lab
+            tube.location = "bag"
+            tube.sprite = ()
+            self.bag_content += 1
+
+        if self.sprite == ether.sprite:
+            #update bag comp and remove object from lab
+            ether.location = "bag"
+            ether.sprite = ()
+            self.bag_content += 1
+
 
 #Definition of the objects
 class Object:
@@ -97,7 +117,7 @@ class Object:
         self.name = type
         self.img = pygame.image.load("img/" + type + ".png").convert()
         self.location = "labyrinth"
-        self.sprite = (0, 0)
+        self.sprite = [0, 0]
 
     #Object generation randomly on a w sprite
     def generate(self, level):
@@ -109,12 +129,18 @@ class Object:
             y = random.randint(0, 14)
 
 
-        self.sprite = (x, y)
+        self.sprite = [x, y]
 
 
     #Display the object
-    def display(self, window):
-        x_pos = self.sprite[0] * 45 + 5
-        y_pos = self.sprite[1] * 45 + 5
-        window.blit(self.img, (y_pos, x_pos))
+    def display(self, window, perso):
+        #separate depending if the object has been collected or not
+        if self.location == "labyrinth":
+            x_pos = self.sprite[0] * 45 + 5
+            y_pos = self.sprite[1] * 45 + 5
 
+        if self.location == "bag":
+            y_pos = 700 + perso.bag_content * 45
+            x_pos = 250
+
+        window.blit(self.img, (y_pos, x_pos))

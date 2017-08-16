@@ -12,13 +12,16 @@ MAIN
 pygame.init()
 
 #Window generation
-window = pygame.display.set_mode((675, 675))
+window = pygame.display.set_mode((1000, 675))
 
 #import  images
 background = pygame.image.load("img/background5.jpg")
 wall = pygame.image.load("img/wall2.jpg")
-finish = pygame.image.load("img/finish.jpg")
+finish = pygame.image.load("img/murdoc.png")
 congrats_message = pygame.image.load("img/winner.jpg")
+intro_message = pygame.image.load("img/intro.png")
+bag_message = pygame.image.load("img/bag.png")
+defeat_message = pygame.image.load("img/lose.jpg")
 
 #Create the level
 level = Labyrinth('Level1')
@@ -59,7 +62,8 @@ window.blit(mcgiver.img, (mcgiver.pos[0], mcgiver.pos[1]))
 #Initialise objects
 needle = Object("needle")
 needle.generate(level)
-needle.display(window)
+needle.display(window, mcgiver)
+
 
 tube = Object("tube")
 tube.generate(level)
@@ -67,14 +71,14 @@ tube.generate(level)
 while tube.sprite == needle.sprite:
     tube.generate(level)
 
-tube.display(window)
+tube.display(window, mcgiver)
 
 ether = Object("ether")
 ether.generate(level)
 #check if not on the needle or tube sprite. If so, reroll
 while ether.sprite == needle.sprite or ether.sprite == tube.sprite:
     ether.generate(level)
-ether.display(window)
+ether.display(window, mcgiver)
 
 
 #Screen refresh
@@ -86,22 +90,24 @@ while loop:
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_UP:
-                mcgiver.move("up", level)
+                mcgiver.move("up", level, needle, tube, ether)
             if event.key == K_DOWN:
-                mcgiver.move("down", level)
+                mcgiver.move("down", level, needle, tube, ether)
             if event.key == K_LEFT:
-                mcgiver.move("left", level)
+                mcgiver.move("left", level, needle, tube, ether)
             if event.key == K_RIGHT:
-                mcgiver.move("right", level)
+                mcgiver.move("right", level, needle, tube, ether)
         if event.type == QUIT:
             loop = 0
 
     # refresh everything
     level.display(level, window)
-    needle.display(window)
-    tube.display(window)
-    ether.display(window)
+    needle.display(window, mcgiver)
+    tube.display(window, mcgiver)
+    ether.display(window, mcgiver)
     window.blit(mcgiver.img, (mcgiver.pos[0], mcgiver.pos[1]))
+    window.blit(intro_message, (690, 0))
+    window.blit(bag_message, (690, 200))
 
     # Screen refresh
     pygame.display.flip()
@@ -109,10 +115,17 @@ while loop:
     if level.grid[mcgiver.sprite[0]][mcgiver.sprite[1]] == "r":
         break
 
+
 while loop:
-    window.blit(congrats_message,(0, 0))
+    if mcgiver.bag_content == 3:
+        window.blit(congrats_message,(0, 0))
+    if mcgiver.bag_content != 3:
+        window.blit(defeat_message, (0, 0))
+
+
     for event in pygame.event.get():
         if event.type == QUIT:
             loop = 0
+
 
     pygame.display.flip()
