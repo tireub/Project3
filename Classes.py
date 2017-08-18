@@ -65,7 +65,7 @@ class Character:
         self.bag_content = 0
 
 
-    def move(self, direction, level, needle, tube, ether):
+    def move(self, direction, level, needle, tube, ether, coin_sound):
 
         #while receiving a direction, check if it's not a wall or the border, then move and update position
         if direction == "up":
@@ -94,19 +94,25 @@ class Character:
             #update bag comp and remove object from lab
             needle.location = "bag"
             needle.sprite = ()
+            needle.bag_position = self.bag_content
             self.bag_content += 1
+            coin_sound.play()
 
         if self.sprite == tube.sprite:
             #update bag comp and remove object from lab
             tube.location = "bag"
             tube.sprite = ()
+            tube.bag_position = self.bag_content
             self.bag_content += 1
+            coin_sound.play()
 
         if self.sprite == ether.sprite:
             #update bag comp and remove object from lab
             ether.location = "bag"
             ether.sprite = ()
+            ether.bag_position = self.bag_content
             self.bag_content += 1
+            coin_sound.play()
 
 
 #Definition of the objects
@@ -118,6 +124,7 @@ class Object:
         self.img = pygame.image.load("img/" + type + ".png").convert()
         self.location = "labyrinth"
         self.sprite = [0, 0]
+        self.bag_position = 0
 
     #Object generation randomly on a w sprite
     def generate(self, level):
@@ -140,7 +147,7 @@ class Object:
             y_pos = self.sprite[1] * 45 + 5
 
         if self.location == "bag":
-            y_pos = 700 + perso.bag_content * 45
+            y_pos = 700 + self.bag_position * 45
             x_pos = 250
 
         window.blit(self.img, (y_pos, x_pos))

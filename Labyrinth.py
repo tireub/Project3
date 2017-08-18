@@ -3,7 +3,6 @@ from pygame.locals import *
 
 from Classes import *
 
-
 '''
 MAIN
 '''
@@ -21,7 +20,13 @@ finish = pygame.image.load("img/murdoc.png")
 congrats_message = pygame.image.load("img/winner.jpg")
 intro_message = pygame.image.load("img/intro.png")
 bag_message = pygame.image.load("img/bag.png")
-defeat_message = pygame.image.load("img/lose.jpg")
+defeat_message = pygame.image.load("img/game_over.png")
+
+#import sounds
+theme_sound = pygame.mixer.Sound("Sound/themesong.wav")
+coin_sound = pygame.mixer.Sound("Sound/coin.wav")
+defeat_sound = pygame.mixer.Sound("Sound/failure_2.wav")
+victory_sound = pygame.mixer.Sound("Sound/victory.wav")
 
 #Create the level
 level = Labyrinth('Level1')
@@ -31,7 +36,6 @@ level.create()
 y_pos = 0
 for lines in level.grid:
     #for each line we set the line position (sprite size = 31*31
-
 
     x_pos = 0
     for sprites in lines:
@@ -64,13 +68,11 @@ needle = Object("needle")
 needle.generate(level)
 needle.display(window, mcgiver)
 
-
 tube = Object("tube")
 tube.generate(level)
 #Check if it is on the same sprite than the needle. If yes reroll
 while tube.sprite == needle.sprite:
     tube.generate(level)
-
 tube.display(window, mcgiver)
 
 ether = Object("ether")
@@ -80,9 +82,11 @@ while ether.sprite == needle.sprite or ether.sprite == tube.sprite:
     ether.generate(level)
 ether.display(window, mcgiver)
 
-
 #Screen refresh
 pygame.display.flip()
+
+#Play theme song
+theme_sound.play()
 
 #Infinite loop to keep the window open
 loop = 1
@@ -90,13 +94,13 @@ while loop:
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_UP:
-                mcgiver.move("up", level, needle, tube, ether)
+                mcgiver.move("up", level, needle, tube, ether, coin_sound)
             if event.key == K_DOWN:
-                mcgiver.move("down", level, needle, tube, ether)
+                mcgiver.move("down", level, needle, tube, ether, coin_sound)
             if event.key == K_LEFT:
-                mcgiver.move("left", level, needle, tube, ether)
+                mcgiver.move("left", level, needle, tube, ether, coin_sound)
             if event.key == K_RIGHT:
-                mcgiver.move("right", level, needle, tube, ether)
+                mcgiver.move("right", level, needle, tube, ether, coin_sound)
         if event.type == QUIT:
             loop = 0
 
@@ -109,11 +113,21 @@ while loop:
     window.blit(intro_message, (690, 0))
     window.blit(bag_message, (690, 200))
 
+
     # Screen refresh
     pygame.display.flip()
 
     if level.grid[mcgiver.sprite[0]][mcgiver.sprite[1]] == "r":
         break
+
+#Stop theme song
+theme_sound.stop()
+
+#Play sound according to result
+if mcgiver.bag_content == 3:
+    victory_sound.play()
+if mcgiver.bag_content != 3:
+    defeat_sound.play()
 
 
 while loop:
@@ -123,9 +137,13 @@ while loop:
         window.blit(defeat_message, (0, 0))
 
 
+
     for event in pygame.event.get():
         if event.type == QUIT:
             loop = 0
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                loop = 0
 
 
     pygame.display.flip()
