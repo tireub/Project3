@@ -22,6 +22,7 @@ intro_message = pygame.image.load("img/intro.png")
 bag_message = pygame.image.load("img/bag.png")
 defeat_message = pygame.image.load("img/game_over.png")
 
+
 #import sounds
 theme_sound = pygame.mixer.Sound("Sound/themesong.wav")
 coin_sound = pygame.mixer.Sound("Sound/coin.wav")
@@ -82,6 +83,9 @@ while ether.sprite == needle.sprite or ether.sprite == tube.sprite:
     ether.generate(level)
 ether.display(window, mcgiver)
 
+#Initialise sound button
+sound = Sound_button(0)
+
 #Screen refresh
 pygame.display.flip()
 
@@ -94,13 +98,21 @@ while loop:
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_UP:
-                mcgiver.move("up", level, needle, tube, ether, coin_sound)
+                mcgiver.move("up", level, needle, tube, ether, sound, coin_sound)
             if event.key == K_DOWN:
-                mcgiver.move("down", level, needle, tube, ether, coin_sound)
+                mcgiver.move("down", level, needle, tube, ether, sound, coin_sound)
             if event.key == K_LEFT:
-                mcgiver.move("left", level, needle, tube, ether, coin_sound)
+                mcgiver.move("left", level, needle, tube, ether, sound, coin_sound)
             if event.key == K_RIGHT:
-                mcgiver.move("right", level, needle, tube, ether, coin_sound)
+                mcgiver.move("right", level, needle, tube, ether, sound, coin_sound)
+        if event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if event.pos[0] > 900 and event.pos[0] < 985 and event.pos[1] > 600 and event.pos[1] < 636:
+                    sound.value_switch()
+                    if sound.state == 1:
+                        pygame.mixer.pause()
+                    if sound.state == 0:
+                        pygame.mixer.unpause()
         if event.type == QUIT:
             loop = 0
 
@@ -112,6 +124,7 @@ while loop:
     window.blit(mcgiver.img, (mcgiver.pos[0], mcgiver.pos[1]))
     window.blit(intro_message, (690, 0))
     window.blit(bag_message, (690, 200))
+    sound.display(window)
 
 
     # Screen refresh
@@ -125,9 +138,11 @@ theme_sound.stop()
 
 #Play sound according to result
 if mcgiver.bag_content == 3:
-    victory_sound.play()
+    if sound.state == 0:
+        victory_sound.play()
 if mcgiver.bag_content != 3:
-    defeat_sound.play()
+    if sound.state == 0:
+        defeat_sound.play()
 
 
 while loop:

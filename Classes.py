@@ -65,7 +65,7 @@ class Character:
         self.bag_content = 0
 
 
-    def move(self, direction, level, needle, tube, ether, coin_sound):
+    def move(self, direction, level, needle, tube, ether, sound, coin_sound):
 
         #while receiving a direction, check if it's not a wall or the border, then move and update position
         if direction == "up":
@@ -96,7 +96,8 @@ class Character:
             needle.sprite = ()
             needle.bag_position = self.bag_content
             self.bag_content += 1
-            coin_sound.play()
+            if sound.state == 0:
+                coin_sound.play()
 
         if self.sprite == tube.sprite:
             #update bag comp and remove object from lab
@@ -104,7 +105,8 @@ class Character:
             tube.sprite = ()
             tube.bag_position = self.bag_content
             self.bag_content += 1
-            coin_sound.play()
+            if sound.state == 0:
+                coin_sound.play()
 
         if self.sprite == ether.sprite:
             #update bag comp and remove object from lab
@@ -112,7 +114,8 @@ class Character:
             ether.sprite = ()
             ether.bag_position = self.bag_content
             self.bag_content += 1
-            coin_sound.play()
+            if sound.state == 0:
+                coin_sound.play()
 
 
 #Definition of the objects
@@ -151,3 +154,28 @@ class Object:
             x_pos = 250
 
         window.blit(self.img, (y_pos, x_pos))
+
+#Definition of sound_button
+class Sound_button:
+    button_images = (pygame.image.load("img/buttonon.jpg"), pygame.image.load("img/buttononoff.jpg"))
+    sound_text = pygame.image.load("img/sound_text.png")
+
+    #Init
+    def __init__(self, initialvalue):
+
+        self.state = initialvalue
+        self.position = (900 , 600)
+        self.img = self.button_images[initialvalue]
+
+
+
+    def value_switch(self):
+        self.state = not self.state
+        self.img = self.button_images[self.state]
+
+    def display(self, window):
+        window.blit(self.sound_text, (self.position[0] - 85, self.position[1] - 12))
+        window.blit(self.img, self.position)
+
+
+
