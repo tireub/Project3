@@ -11,6 +11,8 @@ class Labyrinth:
     def __init__(self , file):
         self.file = file
         self.grid = []
+        self.char_init_pos = (0, 0)
+        self.char_init_sprite = (0, 0)
 
 
 #def Read the file Level1 to import the level structure
@@ -45,6 +47,10 @@ class Labyrinth:
                 # switch between the different types of sprites
                 if sprites == "w" or sprites == "g":
                     window.blit(background, (x, y))
+                    #Generate init position informations for the hero
+                    if sprites == "g":
+                        self.char_init_pos = (x + 7, y)
+                        self.char_init_sprite = (y_pos, x_pos)
                 if sprites == "b":
                     window.blit(wall, (x, y))
                 if sprites == "r":

@@ -34,32 +34,10 @@ level = Labyrinth('Level1')
 level.create()
 
 #display the level
-y_pos = 0
-for lines in level.grid:
-    #for each line we set the line position (sprite size = 31*31
-
-    x_pos = 0
-    for sprites in lines:
-        #for each sprite we calculate the position
-        x = x_pos * 45
-        y = y_pos * 45
-        #switch between the different types of sprites
-        if sprites == "w" or sprites == "g":
-            window.blit(background,(x,y))
-            if sprites == "g":
-                char_pos = (x + 7,y)
-                char_sprite = (y_pos, x_pos)
-
-        elif sprites == "b":
-            window.blit(wall, (x, y))
-        elif sprites == "r":
-            window.blit(finish, (x, y))
-        x_pos += 1
-
-    y_pos += 1
+level.display(level, window)
 
 #Initialise character
-mcgiver = Character(char_pos, char_sprite)
+mcgiver = Character(level.char_init_pos, level.char_init_sprite)
 
 #insert character
 window.blit(mcgiver.img, (mcgiver.pos[0], mcgiver.pos[1]))
@@ -84,18 +62,20 @@ while ether.sprite == needle.sprite or ether.sprite == tube.sprite:
 ether.display(window, mcgiver)
 
 #Initialise sound button
-sound = Sound_button(0)
+sound = Sound_button(1)
 
 #Screen refresh
 pygame.display.flip()
 
-#Play theme song
+#Initiate theme song
 theme_sound.play()
+pygame.mixer.pause()
 
 #Infinite loop to keep the window open
 loop = 1
 while loop:
     for event in pygame.event.get():
+        #Manages the movement orders
         if event.type == KEYDOWN:
             if event.key == K_UP:
                 mcgiver.move("up", level, needle, tube, ether, sound, coin_sound)
@@ -105,6 +85,7 @@ while loop:
                 mcgiver.move("left", level, needle, tube, ether, sound, coin_sound)
             if event.key == K_RIGHT:
                 mcgiver.move("right", level, needle, tube, ether, sound, coin_sound)
+        #Takes a push on the sound button into account
         if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 if event.pos[0] > 900 and event.pos[0] < 985 and event.pos[1] > 600 and event.pos[1] < 636:
@@ -144,7 +125,7 @@ if mcgiver.bag_content != 3:
     if sound.state == 0:
         defeat_sound.play()
 
-
+#Display message according to the result
 while loop:
     if mcgiver.bag_content == 3:
         window.blit(congrats_message,(0, 0))
@@ -152,7 +133,7 @@ while loop:
         window.blit(defeat_message, (0, 0))
 
 
-
+    #2 different end conditions : close the window or push escape
     for event in pygame.event.get():
         if event.type == QUIT:
             loop = 0
